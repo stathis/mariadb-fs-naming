@@ -1,6 +1,17 @@
 {
     "name": "stathis/mariadb-fs-naming",
+	"type": "library",
+	"version": "1.0.0",
     "description": "Enc/dec strings to and from MariaDB/MySQL compatible filenames.",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Stathis Oureilidis",
+			"email": "stathis@stathis.ch",
+			"homepage": "https://stathis.ch",
+			"role": "Developer"
+		}
+	],
     "require": {
         "php": ">=7.3"
     }
