@@ -1,0 +1,8 @@
+{
+    "name": "stathis/mariadb-fs-naming",
+    "description": "Enc/dec strings to and from MariaDB/MySQL compatible filenames.",
+    "require": {
+        "php": ">=7.3"
+    }
+}
+
