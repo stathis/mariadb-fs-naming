@@ -13,6 +13,8 @@
 
 namespace stathis\MariaDB\FilesystemNaming;
 
+class FilesystemNaming {
+
 const touni = [
   0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
   0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
@@ -1087,23 +1089,23 @@ const hex_lo = [
 ];
 
 
-function encode($str) {
+static function encode($str) {
 	$out = '';
 	for ($i = 0; $i < mb_strlen($str); $i++) {
 		$char = mb_substr($str, $i, 1);
 		$code = mb_ord($char);
 
-		if ($code < 128 && filename_safe_char[$code] === 1) {
+		if ($code < 128 && self::filename_safe_char[$code] === 1) {
 			$out .= $char;
 			continue;
 		}
 
 		$out .= '@';
-		if ( ($code >= 0x00C0 && $code <= 0x05FF && ($code = uni_0C00_05FF[$code - 0x00C0])) ||
-			 ($code >= 0x1E00 && $code <= 0x1FFF && ($code = uni_1E00_1FFF[$code - 0x1E00])) ||
-			 ($code >= 0x2160 && $code <= 0x217F && ($code = uni_2160_217F[$code - 0x2160])) ||
-			 ($code >= 0x24B0 && $code <= 0x24EF && ($code = uni_24B0_24EF[$code - 0x24B0])) ||
-			 ($code >= 0xFF20 && $code <= 0xFF5F && ($code = uni_FF20_FF5F[$code - 0xFF20])))
+		if ( ($code >= 0x00C0 && $code <= 0x05FF && ($code = self::uni_0C00_05FF[$code - 0x00C0])) ||
+			 ($code >= 0x1E00 && $code <= 0x1FFF && ($code = self::uni_1E00_1FFF[$code - 0x1E00])) ||
+			 ($code >= 0x2160 && $code <= 0x217F && ($code = self::uni_2160_217F[$code - 0x2160])) ||
+			 ($code >= 0x24B0 && $code <= 0x24EF && ($code = self::uni_24B0_24EF[$code - 0x24B0])) ||
+			 ($code >= 0xFF20 && $code <= 0xFF5F && ($code = self::uni_FF20_FF5F[$code - 0xFF20])))
 		{
 			$out .= mb_chr(($code / 80) + 0x30);
 			$out .= mb_chr(($code % 80) + 0x30);
@@ -1113,22 +1115,22 @@ function encode($str) {
 		/* The following could be implemented like:
 		   $out .= mb_str_pad(dechex($code), 4, '0', STR_PAD_LEFT);
 		 */
-		$out .= hex[($code >> 12) & 15];
-		$out .= hex[($code >> 8) & 15];
-		$out .= hex[($code >> 4) & 15];
-		$out .= hex[($code) & 15];
+		$out .= self::hex[($code >> 12) & 15];
+		$out .= self::hex[($code >> 8) & 15];
+		$out .= self::hex[($code >> 4) & 15];
+		$out .= self::hex[($code) & 15];
 	}
 	return $out;
 }
 
-function decode($str) {
+static function decode($str) {
 	$out = '';
 	$len = strlen($str);
 	for ($i = 0; $i < $len; $i++) {
 		$char = substr($str, $i, 1);
 		$code = ord($char);
 
-		if ($code < 128 && filename_safe_char[$code] === 1) {
+		if ($code < 128 && self::filename_safe_char[$code] === 1) {
 			$out .= $char;
 			continue;
 		}
@@ -1146,8 +1148,8 @@ function decode($str) {
 			$byte2 >= 0x30 && $byte2 <= 0x7F)
 		{
 			$code = ($byte1 - 0x30) * 80 + $byte2 - 0x30;
-			if ($code < 5994 && touni[$code]) {
-				$out .= mb_chr(touni[$code]);
+			if ($code < 5994 && self::touni[$code]) {
+				$out .= mb_chr(self::touni[$code]);
 				$i += 2;
 				continue;
 			}
@@ -1159,13 +1161,13 @@ function decode($str) {
 		if ($i + 4 > $len) {
 			break;
 		}
-		if ($byte1 = hex_lo[$byte1] >= 0 &&
-			$byte2 = hex_lo[$byte2] >= 0)
+		if ($byte1 = self::hex_lo[$byte1] >= 0 &&
+			$byte2 = self::hex_lo[$byte2] >= 0)
 		{
 			$tmpb3 = ord(substr($str, $i + 3, 1));
-			$byte3 = hex_lo[$tmpb3];
+			$byte3 = self::hex_lo[$tmpb3];
 			$tmpb4 = ($byte3) ? ord(substr($str, $i + 4, 1)) : 0;
-			$byte4 = hex_lo[$tmpb4];
+			$byte4 = self::hex_lo[$tmpb4];
 
 			if ($byte3 >= 0 && $byte4 >= 0) {
 				$out .= chr(($byte1 << 12) + ($byte2 << 8) + ($byte3 << 4) + $byte4);
@@ -1178,5 +1180,6 @@ function decode($str) {
 	return $out;
 }
 
+}// class
 
 
